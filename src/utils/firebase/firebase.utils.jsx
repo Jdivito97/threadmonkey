@@ -1,58 +1,76 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
-} from "firebase/auth";
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBvtYmjFZibBwquX07K7Wjrko1K5ain_cg",
-  authDomain: "gym-daze-db.firebaseapp.com",
-  projectId: "gym-daze-db",
-  storageBucket: "gym-daze-db.appspot.com",
-  messagingSenderId: "226141451700",
-  appId: "1:226141451700:web:2d2c279791da5ea80aeee1",
+  apiKey: 'AIzaSyBvtYmjFZibBwquX07K7Wjrko1K5ain_cg',
+  authDomain: 'gym-daze-db.firebaseapp.com',
+  projectId: 'gym-daze-db',
+  storageBucket: 'gym-daze-db.appspot.com',
+  messagingSenderId: '226141451700',
+  appId: '1:226141451700:web:2d2c279791da5ea80aeee1',
 };
 
-// Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
-  prompt: "select_account",
+const googleProvider = new GoogleAuthProvider();
+
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
+
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
-  const userDocRef = doc(db, "users", userAuth.uid);
-  console.log(userDocRef);
+export const createUserDocumentFromAuth = async (
+  userAuth,
+  additionalInformation = {}
+) => {
+  if (!userAuth) return;
+
+  const userDocRef = doc(db, 'users', userAuth.uid);
+
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot);
-  console.log(userSnapshot.exists());
 
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
 
     try {
-      await setDoc(userDocRef, { displayName, email, createdAt });
+      await setDoc(userDocRef, {
+        displayName,
+        email,
+        createdAt,
+        ...additionalInformation,
+      });
     } catch (error) {
-      console.error("error createing user");
+      console.log('error creating the user', error.message);
     }
-    return userDocRef;
   }
 
-  // if user data doesn't exist...
-  // create / set the document with the data from userAuth in my collection
+  return userDocRef;
+};
 
-  // if user data exists...
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
 
-  //return userDocRef
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return await signInWithEmailAndPassword(auth, email, password);
 };
