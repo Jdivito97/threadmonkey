@@ -1,13 +1,16 @@
 import { useState } from 'react';
+
+import FormInput from '../form-input/form-input.component';
+import Button from '../button/button.component';
+
 import {
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
 } from '../../utils/firebase/firebase.utils';
-import FormInput from '../form-input/form-input.component';
-import Button from '../button/button.component';
-import './sign-up.styles.scss';
 
-const defaultFormfields = {
+import { SignUpContainer } from './sign-up.styles';
+
+const defaultFormFields = {
   displayName: '',
   email: '',
   password: '',
@@ -15,16 +18,13 @@ const defaultFormfields = {
 };
 
 const SignUp = () => {
-  const [formFields, setFormFields] = useState(defaultFormfields);
+  const [formFields, setFormFields] = useState(defaultFormFields);
   const { displayName, email, password, confirmPassword } = formFields;
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormFields({ ...formFields, [name]: value });
-    console.log(formFields);
-  };
+
   const resetFormFields = () => {
-    setFormFields(defaultFormfields);
+    setFormFields(defaultFormFields);
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -49,10 +49,17 @@ const SignUp = () => {
       }
     }
   };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormFields({ ...formFields, [name]: value });
+  };
+
   return (
-    <div className='sign-up-container'>
-      <h2>Dont have an acount?</h2>
-      <span>Sign up wiht your email and passwword</span>
+    <SignUpContainer>
+      <h2>Don't have an account?</h2>
+      <span>Sign up with your email and password</span>
       <form onSubmit={handleSubmit}>
         <FormInput
           label='Display Name'
@@ -91,7 +98,8 @@ const SignUp = () => {
         />
         <Button type='submit'>Sign Up</Button>
       </form>
-    </div>
+    </SignUpContainer>
   );
 };
+
 export default SignUp;

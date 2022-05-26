@@ -1,11 +1,10 @@
-import categories from "../../components/category item/categorymenu";
-import Directory from "../../components/directory/directory.component";
-import "../../components//directory/directory.styles.scss";
+import categories from '../../components/directory-item/categorymenu';
+import Directory from '../../components/directory/directory.component';
 
 const Home = () => {
   return (
     <>
-      <Directory categories={categories} />
+      <Directory />
     </>
   );
 };
